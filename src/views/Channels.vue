@@ -7,25 +7,72 @@
 			<header class="flex flex_row font_1 m-t_2">
 				<BreadCrumb v-bind="navData" />
 			</header>
-			<main>
-				<div class="w_100">
+			<main class="flex flex_row:lg flex_column">
+				<section class="flex_auto">
 					<div class="flex flex_row">
 						<h1 class="font_5 c_black-9 p-t_4 flex_auto text_left">
-							Program
+							{{ title }}
 						</h1>
-						<div class="self_center m-l_auto">
+					</div>
+					<div class="flex flex_row gap-x_3">
+						<h3 class="font_3 c_black-9 flex_auto">All Channels</h3>
+						<div
+							class="flex flex_auto max-w_15 font_n2 self_center"
+						>
+							<span class="font_bold self_center">Status:</span>
+							<select
+								class="lh_1 font_n2 p_2 p-y_0 font_n1 m-l_3"
+							>
+								<option label="all" />
+								<option label="completed" />
+								<option label="alert" />
+								<option label="warning" />
+							</select>
+						</div>
+						<div
+							class="flex flex_auto max-w_15 font_n2 self_center"
+						>
+							<span class="font_bold self_center">Sort:</span
+							><select
+								class="lh_1 font_n2 p_2 p-y_0 font_n1 m-l_3"
+							>
+								<option label="all" />
+							</select>
+						</div>
+						<div
+							class="
+								flex flex_shrink
+								max-w_15
+								font_n2
+								self_center
+							"
+						>
 							<Btn
-								@onClick="onNewObject"
+								class="lh_1 p-x_3 h:bg_primary h:c_white"
+								:state="'none'"
+								:size="'tiny'"
+								:shadow="false"
+								:corner="'round'"
+								@onClick="isSearchVisible = !isSearchVisible"
+								><i class="far p-r_3 p_1 fa-search"></i> Search
+							</Btn>
+						</div>
+						<div class="self_center">
+							<Btn
 								class="lh_1 p-x_3"
 								:state="'secondary'"
 								:size="'tiny'"
 								:shadow="false"
 								:corner="'round'"
 								><i class="far p-r_3 p_1 fa-plus"></i> new
+								channel
 							</Btn>
 						</div>
 					</div>
-					<div class="flex flex_row p-y_3 w_100">
+					<div
+						class="flex flex_row p-y_3 w_100"
+						v-if="isSearchVisible"
+					>
 						<SearchBar class="w_100" />
 					</div>
 					<div class="bg_black-2 br_1 br_black-2 br_solid">
@@ -85,15 +132,82 @@
 								</article>
 							</template>
 							<template v-slot:listLoaded>
-								<Program
-									v-for="(program, index) in list"
-									v-bind="program"
-									:key="'Program' + index"
+								<Channel
+									v-for="(channel, index) in list"
+									v-bind="channel"
+									:key="'channel_' + index"
 								/>
 							</template>
 						</ListLoader>
 					</div>
-				</div>
+				</section>
+				<section
+					class="
+						flex_auto
+						p-l_5
+						max-w_20:lg
+						flex flex_row flex_column:lg
+						font_0
+					"
+				>
+					<div class="">
+						<h3 class="font_display font-size_up-2">Overview</h3>
+						<StateChart
+							:chartData="chartData"
+							:allLabel="'all sessions'"
+							:allColor="'black'"
+							class="m-b_5"
+						/>
+					</div>
+					<div>
+						<h3 class="font_display font-size_up-2">
+							<i class="far fa-fa-users-crown"></i>
+							Editorial Staff
+							<Btn
+								@onClick="onNewEditor()"
+								class="lh_0 p-x_3 float_right"
+								:state="'secondary'"
+								:size="'tiny'"
+								:shadow="false"
+								:corner="'round'"
+								><i class="far p-r_3 p_1 fa-plus"></i> new
+							</Btn>
+						</h3>
+						<ul
+							class="
+								list-group
+								ul_none
+								m-b_5
+								br_1 br_solid br_black-2 br_radius
+							"
+						>
+							<li
+								v-for="(email, index) in emailList"
+								:key="email.id"
+								class="p_2 br_0 br_solid br_black-2"
+								:class="{ 'br-t_1': index > 0 }"
+							>
+								<UserEmailSimple v-bind="email" />
+							</li>
+						</ul>
+					</div>
+					<div>
+						<h3 class="font_display font-size_up-2">
+							Available Credits
+						</h3>
+						<ul class="list-group ul_none m-b_5 font-size_up">
+							<li
+								v-for="(key, value, index) in creditList"
+								:key="'c_' + index"
+								class="lh_2 p-y_2 br_0 br_solid br_black-2"
+								:class="{ 'br-t_1': index > 0 }"
+							>
+								<strong>{{ value }}: </strong
+								><span class="c_primary">{{ key }}</span>
+							</li>
+						</ul>
+					</div>
+				</section>
 			</main>
 		</section>
 	</div>
@@ -104,27 +218,38 @@
 import BreadCrumb from "../../Origami/src/components/Navigation/App.BreadCrumb.vue";
 import TreeNav from "../../Origami/src/components/Navigation/App.SideNav.List.vue";
 import ListLoader from "../../Origami/src/components/subComponents/ListLoader.vue";
-import Program from "../../Origami/src/components/AgendaManagement/Agenda.ProgramListItem";
+import Channel from "../../Origami/src/components/AgendaManagement/Agenda.ChannelListItem";
 import Btn from "../../Origami/src/components/subComponents/Btn.vue";
 import LoadingText from "../../Origami/src/components/subComponents/LoadingText.vue";
 import SearchBar from "../../Origami/src/components/BasicForms/Input.SearchBar.vue";
-import { programListData } from "../../Origami/src/stories/100-ProductUI/AgendaManager/Data/programList.js";
+import StateChart from "../../Origami/src/components/AgendaManagement/SubComponents/Agenda.StateChart.vue";
+import UserEmailSimple from "../../Origami/src/components/subComponents/User/User.EmailListItem.vue";
+import { channelListData } from "../../Origami/src/stories/100-ProductUI/AgendaManager/Data/channelList.js";
+import { programChart, creditList } from "../../Origami/src/stories/100-ProductUI/AgendaManager/Data/charts.js";
 export default {
-	name: "Home",
+	name: "Channels",
 	components: {
 		BreadCrumb,
 		TreeNav,
 		ListLoader,
-		Program,
+		Channel,
 		Btn,
 		LoadingText,
 		SearchBar,
+		StateChart,
+		UserEmailSimple
+	},
+	props: {
+		title: { type: String, default: "ACC 2021" },
+
+
 	},
 	data() {
 		return {
-			list: programListData.sort((a, b) => {
-				return a.label < b.label ? -1 : 1;
-			}),
+			isSearchVisible: false,
+			list: channelListData,
+			chartData: programChart,
+			creditList: creditList,
 			navData: {
 				label: "Home",
 				type: "home",
@@ -139,7 +264,7 @@ export default {
 					{
 						label: "All Programs",
 						type: "program",
-						isActive: true,
+
 						pageID: 1351,
 					},
 					{
@@ -150,6 +275,7 @@ export default {
 						label: "ACC 2021",
 						type: "program",
 						pageID: 1351,
+						isActive: true,
 						nodes: [
 							{
 								label: "Featured Sessions",
@@ -256,6 +382,43 @@ export default {
 					{ label: "New User", type: "new" },
 				],
 			},
+			emailList: [{
+				"id": "9fea071d-c9e1-4587-92f8-e7cc38db9713",
+				"fullName": "Rozella Padilla",
+				"email": "rpadilla0@unc.edu",
+				"showEdit": false,
+				"showRemove": true
+			}, {
+				"id": "7db7915e-a613-4fd6-bdde-a3ca44ecc2ec",
+				"fullName": "Miguelita Brasener",
+				"email": "mbrasener1@lulu.com",
+				"showEdit": false,
+				"showRemove": true
+			}, {
+				"id": "05167f41-015a-4fd6-b34f-0de742e9561d",
+				"fullName": "Clerissa Pollendine",
+				"email": "cpollendine2@instagram.com",
+				"showEdit": false,
+				"showRemove": true
+			}, {
+				"id": "185f7f84-8391-448e-95b4-2eaa3e197ad9",
+				"fullName": "Celestine Singers",
+				"email": "csingers3@diigo.com",
+				"showEdit": false,
+				"showRemove": true
+			}, {
+				"id": "f9fc195b-399e-4c0c-9083-617c985707d1",
+				"fullName": "Bourke Juan",
+				"email": "bjuan4@vistaprint.com",
+				"showEdit": false,
+				"showRemove": true
+			}, {
+				"id": "6b022517-d451-42a6-b63d-57e84a63cef7",
+				"fullName": "Freddie Bootherstone",
+				"email": "fbootherstone5@unicef.org",
+				"showEdit": false,
+				"showRemove": true
+			}]
 		};
 	},
 };

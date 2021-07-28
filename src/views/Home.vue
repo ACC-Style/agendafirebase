@@ -11,7 +11,7 @@
 				<div class="w_100">
 					<div class="flex flex_row">
 						<h1 class="font_5 c_black-9 p-t_4 flex_auto text_left">
-							Program
+							All Programs
 						</h1>
 						<div class="self_center m-l_auto">
 							<Btn
@@ -129,6 +129,7 @@ export default {
 				label: "Home",
 				type: "home",
 				pageID: -1,
+				isActive: true,
 				nodes: [
 					{
 						label: "Programs & Channels",
@@ -139,7 +140,7 @@ export default {
 					{
 						label: "All Programs",
 						type: "program",
-						isActive: true,
+
 						pageID: 1351,
 					},
 					{
@@ -205,41 +206,22 @@ export default {
 						],
 					},
 					{ label: "New Session", type: "new" },
-					{ label: "Elements Library", type: "headline" },
 					{
-						label: "Presentations",
-						type: "presentations",
-						pageID: 1351,
+						label: "Elements Library", type: "headline",
+						nodes: [{
+							label: "Presentations",
+							type: "presentations",
+							pageID: 1351,
+						},
+						{
+							label: "Tags",
+							type: "tags",
+							pageID: 1351,
+
+						},
+						{ label: "Attachments", type: "attachments", pageID: 1351 },]
 					},
-					{ label: "New Presentation", type: "new" },
-					{
-						label: "Tags",
-						type: "tags",
-						pageID: 1351,
-						nodes: [
-							{
-								label: "Recently Modified",
-								type: "sub-headline",
-							},
-							{
-								label: "Learning Pathway",
-								type: "tag",
-								pageID: 1351,
-							},
-							{
-								label: "Session Format",
-								type: "tag",
-								pageID: 1351,
-							},
-							{
-								label: "Session Type",
-								type: "tag",
-								pageID: 1351,
-							},
-						],
-					},
-					{ label: "New Tag", type: "new" },
-					{ label: "Attachments", type: "attachments", pageID: 1351 },
+
 					{
 						label: "Users",
 						type: "headline",
@@ -252,8 +234,7 @@ export default {
 							},
 							{ label: "Admins", type: "admin", pageID: 1351 },
 						],
-					},
-					{ label: "New User", type: "new" },
+					}
 				],
 			},
 		};

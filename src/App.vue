@@ -4,7 +4,8 @@
       <span class="font_bold m-r_3">ACC: Agenda Management</span>
       <router-link class="c_white-7 h:c_white" to="/">Program</router-link> |
       <router-link class="c_white-7 h:c_white" to="/Channels">Channels</router-link> |
-      <router-link class="c_white-7 h:c_white" to="/Sessions">Sessions</router-link>
+      <router-link class="c_white-7 h:c_white" to="/Sessions">Sessions</router-link>|
+      <router-link class="c_white-7 h:c_white" to="/Session">Session</router-link>
     </div>
     <router-view/>
   </div>

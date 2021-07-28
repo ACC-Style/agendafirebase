@@ -159,6 +159,50 @@
 							class="m-b_5"
 						/>
 					</div>
+					<div class="">
+						<h3 class="font_display font-size_up-2">Actions</h3>
+						<ul
+							class="
+								ul_none
+								list-group
+								m-b_5
+								br_1 br_solid br_black-2 br_radius
+							"
+						>
+							<li
+								class="
+									p_2
+									br_0 br_solid br_black-2
+									br-t_1
+									h:bg_primary-5
+								"
+							>
+								<a href="" class="h:undecorated"
+									>Duplicate Program</a
+								>
+							</li>
+							<li
+								class="
+									p_2
+									br_0 br_solid br_black-2
+									br-t_1
+									h:bg_primary-5
+								"
+							>
+								<a href="" class="h:undecorated">Export Data</a>
+							</li>
+							<li
+								class="
+									p_2
+									br_0 br_solid br_black-2
+									br-t_1
+									h:bg_primary-5
+								"
+							>
+								<a href="" class="h:undecorated">Copy API</a>
+							</li>
+						</ul>
+					</div>
 					<div>
 						<h3 class="font_display font-size_up-2">
 							<i class="far fa-fa-users-crown"></i>
@@ -191,6 +235,7 @@
 							</li>
 						</ul>
 					</div>
+
 					<div>
 						<h3 class="font_display font-size_up-2">
 							Available Credits
@@ -331,41 +376,22 @@ export default {
 						],
 					},
 					{ label: "New Session", type: "new" },
-					{ label: "Elements Library", type: "headline" },
 					{
-						label: "Presentations",
-						type: "presentations",
-						pageID: 1351,
+						label: "Elements Library", type: "headline",
+						nodes: [{
+							label: "Presentations",
+							type: "presentations",
+							pageID: 1351,
+						},
+						{
+							label: "Tags",
+							type: "tags",
+							pageID: 1351,
+
+						},
+						{ label: "Attachments", type: "attachments", pageID: 1351 },]
 					},
-					{ label: "New Presentation", type: "new" },
-					{
-						label: "Tags",
-						type: "tags",
-						pageID: 1351,
-						nodes: [
-							{
-								label: "Recently Modified",
-								type: "sub-headline",
-							},
-							{
-								label: "Learning Pathway",
-								type: "tag",
-								pageID: 1351,
-							},
-							{
-								label: "Session Format",
-								type: "tag",
-								pageID: 1351,
-							},
-							{
-								label: "Session Type",
-								type: "tag",
-								pageID: 1351,
-							},
-						],
-					},
-					{ label: "New Tag", type: "new" },
-					{ label: "Attachments", type: "attachments", pageID: 1351 },
+
 					{
 						label: "Users",
 						type: "headline",
@@ -378,8 +404,7 @@ export default {
 							},
 							{ label: "Admins", type: "admin", pageID: 1351 },
 						],
-					},
-					{ label: "New User", type: "new" },
+					}
 				],
 			},
 			emailList: [{

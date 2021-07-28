@@ -1,9 +1,9 @@
 <template>
 	<div class="home flex flex_row font_0 p_4">
-		<nav class="p_5 br-r_1 br_black-1 br_solid flex_none max-w_25 font_1">
+		<nav class="p_4 p-l_0 br-r_1 br_black-1 br_solid flex_none max-w_20 font_1">
 			<TreeNav v-bind="navData" :toggleOpenByDefault="true" />
 		</nav>
-		<section class="flex_column flex flex_auto p_5">
+		<section class="flex_column flex flex_auto p_5 p-t_4">
 			<header class="flex flex_row font_1 m-t_2">
 				<BreadCrumb v-bind="navData" />
 			</header>

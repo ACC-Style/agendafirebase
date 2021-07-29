@@ -11,7 +11,7 @@
 				font_1
 			"
 		>
-			<TreeNav v-bind="navData" :toggleOpenByDefault="true" />
+			<TreeNav v-bind="navData" @onNewObject="newModalVisible=true" :toggleOpenByDefault="true" />
 		</nav>
 		<section class="flex_column flex flex_auto p_5 p-t_4">
 			<header class="flex flex_row font_1 m-t_2">

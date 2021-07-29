@@ -1,0 +1,23 @@
+<!-- The core Firebase JS SDK is always required and must be listed first -->
+<script src="https://www.gstatic.com/firebasejs/8.8.0/firebase-app.js"></script>
+
+<!-- TODO: Add SDKs for Firebase products that you want to use
+     https://firebase.google.com/docs/web/setup#available-libraries -->
+<script src="https://www.gstatic.com/firebasejs/8.8.0/firebase-analytics.js"></script>
+
+<script>
+  // Your web app's Firebase configuration
+  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+  var firebaseConfig = {
+    apiKey: "AIzaSyDIug9ErItR1hH8RpP7M8OOXMjDMpvyEKQ",
+    authDomain: "vueagenda.firebaseapp.com",
+    projectId: "vueagenda",
+    storageBucket: "vueagenda.appspot.com",
+    messagingSenderId: "171360346249",
+    appId: "1:171360346249:web:d92754ddde96b787e7e658",
+    measurementId: "G-SKDFM23B6X"
+  };
+  // Initialize Firebase
+  firebase.initializeApp(firebaseConfig);
+  firebase.analytics();
+</script>

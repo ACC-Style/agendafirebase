@@ -1,6 +1,16 @@
 <template>
 	<div class="home flex flex_row font_0 p_4">
-		<nav class="p_4 p-l_0 br-r_1 br_black-1 br_solid flex_none max-w_20 font_1">
+		<nav
+			class="
+				p_4
+				p-l_0
+				br-r_1
+				br_black-1 br_solid
+				flex_none
+				max-w_20
+				font_1
+			"
+		>
 			<TreeNav v-bind="navData" :toggleOpenByDefault="true" />
 		</nav>
 		<section class="flex_column flex flex_auto p_5 p-t_4">
@@ -26,7 +36,10 @@
 						</div>
 					</div>
 					<div class="flex flex_row p-y_3 w_100">
-						<SearchBar class="w_100" />
+						<SearchBar
+							class="w_100"
+							:inputId="'searchbarproducts'"
+						/>
 					</div>
 					<div class="bg_black-2 br_1 br_black-2 br_solid">
 						<ListLoader :list="list">
@@ -80,7 +93,7 @@
 										first Program to this program.
 									</p>
 									<div class="text_center">
-										<Btn>Add Program</Btn>
+										<Btn @onClick="onNewObject">Add Program</Btn>
 									</div>
 								</article>
 							</template>
@@ -89,6 +102,7 @@
 									v-for="(program, index) in list"
 									v-bind="program"
 									:key="'Program' + index"
+									@onClick="onProgramClick(program.id,$event)"
 								/>
 							</template>
 						</ListLoader>
@@ -96,11 +110,18 @@
 				</div>
 			</main>
 		</section>
+		<Modal v-if="newModalVisible" @onClose="closeAddNewModal">
+			<template v-slot:header><h1>Add Program</h1></template>
+			<NewProgram @onClose="closeAddNewModal" />
+		</Modal>
 	</div>
 </template>
 
 <script>
 // @ is an alias to /src
+
+import { programsCollection,deleteProgram } from '@/firebase';
+import NewProgram from "@/components/newProgram.vue";
 import BreadCrumb from "../../Origami/src/components/Navigation/App.BreadCrumb.vue";
 import TreeNav from "../../Origami/src/components/Navigation/App.SideNav.List.vue";
 import ListLoader from "../../Origami/src/components/subComponents/ListLoader.vue";
@@ -108,7 +129,8 @@ import Program from "../../Origami/src/components/AgendaManagement/Agenda.Progra
 import Btn from "../../Origami/src/components/subComponents/Btn.vue";
 import LoadingText from "../../Origami/src/components/subComponents/LoadingText.vue";
 import SearchBar from "../../Origami/src/components/BasicForms/Input.SearchBar.vue";
-import { programListData } from "../../Origami/src/stories/100-ProductUI/AgendaManager/Data/programList.js";
+import Modal from "../../Origami/src/components/subComponents/Modal.vue";
+// import { programListData } from "../../Origami/src/stories/100-ProductUI/AgendaManager/Data/programList.js";
 export default {
 	name: "Home",
 	components: {
@@ -119,12 +141,17 @@ export default {
 		Btn,
 		LoadingText,
 		SearchBar,
+		NewProgram,
+		Modal,
 	},
 	data() {
 		return {
-			list: programListData.sort((a, b) => {
-				return a.label < b.label ? -1 : 1;
-			}),
+			newModalVisible: false,
+			list: null,
+
+			// list: programListData.sort((a, b) => {
+			// 	return a.label < b.label ? -1 : 1;
+			// }),
 			navData: {
 				label: "Home",
 				type: "home",
@@ -135,7 +162,6 @@ export default {
 						label: "Programs & Channels",
 						type: "headline",
 						pageID: 1351,
-
 					},
 					{
 						label: "All Programs",
@@ -156,7 +182,6 @@ export default {
 								label: "Featured Sessions",
 								type: "collection",
 								pageID: 1351,
-
 							},
 							{
 								label: "Pathway Collections",
@@ -207,19 +232,25 @@ export default {
 					},
 					{ label: "New Session", type: "new" },
 					{
-						label: "Elements Library", type: "headline",
-						nodes: [{
-							label: "Presentations",
-							type: "presentations",
-							pageID: 1351,
-						},
-						{
-							label: "Tags",
-							type: "tags",
-							pageID: 1351,
-
-						},
-						{ label: "Attachments", type: "attachments", pageID: 1351 },]
+						label: "Elements Library",
+						type: "headline",
+						nodes: [
+							{
+								label: "Presentations",
+								type: "presentations",
+								pageID: 1351,
+							},
+							{
+								label: "Tags",
+								type: "tags",
+								pageID: 1351,
+							},
+							{
+								label: "Attachments",
+								type: "attachments",
+								pageID: 1351,
+							},
+						],
 					},
 
 					{
@@ -234,10 +265,57 @@ export default {
 							},
 							{ label: "Admins", type: "admin", pageID: 1351 },
 						],
-					}
+					},
 				],
 			},
 		};
 	},
+	methods: {
+		closeAddNewModal(){
+			this.newModalVisible = false;
+			this.getList();
+		},
+		onNewObject() {
+			this.newModalVisible = true;
+		},
+		onDeleteObject(id){
+			return id;
+		},
+		onProgramClick(id,payload){
+			console.table(payload);
+			console.log(`id ${id}`);
+			if(payload === 'delete'){
+				deleteProgram(id)
+			}
+			this.getList() 
+		},
+		async getList() {
+			try {
+				const { docs } = await programsCollection.get();
+
+				this.list = docs.map(doc => {
+					const { id } = doc;
+					const data = doc.data();
+					return { id, ...data };
+				});
+				console.log("loaded list");
+			} catch (error) {
+				throw new Error("Something gone wrong!" + error);
+			}
+		},
+	},
+	mounted() {
+		this.getList();
+	},
+
+	// async mounted(){
+	// 	try {
+	// 	this.list = await	useLoadPrograms();
+	// 	this.error = null
+	// 	} catch (error) {
+	// 		this.list = null;
+	// 		this.error = error;
+	// 	}
+	// }
 };
 </script>

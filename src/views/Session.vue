@@ -1,6 +1,16 @@
 <template>
 	<div class="home flex flex_row font_0 p_4">
-		<nav class="p_4 p-l_0 br-r_1 br_black-1 br_solid flex_none max-w_20 font_1">
+		<nav
+			class="
+				p_4
+				p-l_0
+				br-r_1
+				br_black-1 br_solid
+				flex_none
+				max-w_20
+				font_1
+			"
+		>
 			<TreeNav v-bind="navData" :toggleOpenByDefault="true" />
 		</nav>
 		<section class="flex_column flex flex_auto p_5 p-t_4">
@@ -8,16 +18,17 @@
 				<BreadCrumb v-bind="navData" />
 			</header>
 			<section class="flex flex_row:lg flex_column m-b_4 p-b_4">
-				<section class="flex_auto">
+				<section class="flex_auto w_50">
 					<div class="flex flex_row">
 						<h1 class="font_5 c_black-9 p-t_4 flex_auto text_left">
 							{{ agenda.id }}: {{ agenda.title }}
 						</h1>
 					</div>
 					<form id="AgendaData" class="">
-						<h3>Agenda Data</h3>
-						<div class="flex flex_row gap-x_4">
+						<h3  class="font_display font_4 c_primary-n2">Agenda Data</h3>
+						<div class="flex flex_row flex_wrap gap-y_4 gap-x_4">
 							<InputText
+								class="flex_auto w_5"
 								:type="'number'"
 								v-model.number="agenda.id"
 								:required="true"
@@ -26,10 +37,9 @@
 							<InputText
 								v-model="agenda.title"
 								:required="true"
+								class="flex_auto w_60"
 							>
-								<template v-slot:default>
-									Session Title
-								</template>
+								Session Title
 								<template v-slot:hint>
 									Changing the session title here will on
 									change it for this session only in this
@@ -37,33 +47,68 @@
 									alter it in the session data section.
 								</template>
 							</InputText>
+							<InputTextArea
+								class="w_100 flex_none"
+								:required="true"
+								v-model="agenda.description"
+								><template v-slot:default>
+									Description
+								</template></InputTextArea
+							>
+							<field-set-group class="w_100">
+								<template v-slot:legend>Timing</template>
+								<div
+									class="
+										flex flex_row
+										gap-x_4
+										gap-y_4
+										flex_wrap
+									"
+								>
+									<input-text
+										v-model="agenda.Date"
+										:type="'date'"
+										>Date</input-text
+									>
+									<input-text
+										v-model="agenda.startTime"
+										:type="'time'"
+										>Start Time</input-text
+									>
+									<input-text
+										icon="fa-stopwatch"
+										postLabel="min"
+										v-model.number="agenda.duration"
+										:type="'number'"
+										>Duration</input-text
+									>
+									<InputRadioButtons
+										class="flex_auto"
+										v-model="agenda.releaseToOnDemand"
+										>Release to On Demand
+										<template v-slot:legend
+											>Select One</template
+										>
+									</InputRadioButtons>
+									<InputCheckBoxes
+										class="flex_auto"
+										v-model="
+											agenda.releaseToOnDemandCheckmarks
+										"
+										>Release to On Demand
+										<template v-slot:legend
+											>Select All That Apply</template
+										>
+									</InputCheckBoxes>
+								</div>
+							</field-set-group>
 						</div>
-						<InputTextArea class="w_100" :required="true" v-model="agenda.description"
-							><template v-slot:default>
-								Description
-							</template></InputTextArea
-						>
-						<field-set-group legend="Timing">
-							<input-text v-model="agenda.Date" :type="'date'">Date</input-text>
-							<input-text v-model="agenda.startTime" :type="'time'">Start Time</input-text>
-							<input-text icon="fa-stopwatch"  postLabel="min" v-model.number="agenda.duration" :type="'number'" >Duration</input-text>
-							<InputCheckmarks 
-							v-model="agenda.releaseToOnDemand" :checkboxes="onDemandCheckBoxes" >Release to On Demand</InputCheckmarks>
-						</field-set-group>
 					</form>
-					<div class="m-y_4 p_4 bg_black-3">
-						Section with data around the agenda.
-					</div>
-					<div class="m-y_4 p_4 bg_black-3">
-						Type of release and date time requirements.
-					</div>
-					<div class="m-y_4 p_4 bg_black-3">
-						Delay time to on demand.
-					</div>
 				</section>
 				<section
 					class="
 						flex_auto
+						w_30
 						p-l_5
 						max-w_20:lg
 						flex flex_row flex_column:lg
@@ -239,7 +284,7 @@
 					</div>
 				</section>
 			</section>
-			<h3>Attached Session</h3>
+			<h3 class="font_display font_4 c_primary-n2">Attached Session</h3>
 			<section
 				class="br_1 br_solid br_black-3 br_radius shadow_overlap-light"
 			>
@@ -252,19 +297,7 @@
 						justify_center
 					"
 				>
-					<input
-						class="
-							br_2
-							p-y_2
-							br_solid
-							flex_auto
-							p-l_4
-							lh_3
-							br_black-2
-							w_100
-						"
-						v-model="title"
-					/>
+					<InputText class="self_stretch w_100 flex_auto" v-model="title" :state="'disabled'"></InputText>
 					<Btn class="m-l_3" :size="'small'">Change</Btn>
 					<Btn
 						class="m-l_3"
@@ -274,11 +307,28 @@
 						>Remove</Btn
 					>
 				</header>
-				<div class="m_4 p_4 bg_black-3">
-					Content area for the session data.
+				<div class="flex flex_row:md">
+					<div class="flex_auto:md w_60">
+						<div class="m_4 p_4 bg_black-3">
+							Content area for the session data.
+						</div>
+						<div class="m_4 p_4 bg_black-3">Source Info</div>
+						<div class="m_4 p_4 bg_black-3">Credit Values.</div>
+					</div>
+					<div class="flex_auto:md w_30 bg_black-2 shaow_emboss-light br-l_1 br_solid br_black-3">
+						<div class="flex flex_inline bg_white p_3  br-b_1 br_solid br_black-3">
+							<h3 class="font_display font_4 c_primary-n2 self_center m_0">Presentaions</h3>
+							<Btn
+									class="lh_1 p-x_3 m-l_auto self_center flex_none"
+									:state="'secondary'"
+									:size="'tiny'"
+									:shadow="false"
+									:corner="'round'"
+									><i class="far p-r_3 p_1 fa-plus"></i> new
+								</Btn>
+						</div>
+						&nbsp;</div>
 				</div>
-				<div class="m_4 p_4 bg_black-3">Source Info</div>
-				<div class="m_4 p_4 bg_black-3">Credit Values.</div>
 			</section>
 		</section>
 	</div>
@@ -291,12 +341,11 @@ import TreeNav from "../../Origami/src/components/Navigation/App.SideNav.List.vu
 import Btn from "../../Origami/src/components/subComponents/Btn.vue";
 import InputText from "../../Origami/src/components/BasicForms/Input.Text.vue";
 import InputTextArea from "../../Origami/src/components/BasicForms/Input.TextArea.vue";
-import InputCheckmarks from "../../Origami/src/components/BasicForms/Input.Check.vue";
+import InputRadioButtons from "../../Origami/src/components/BasicForms/Input.RadioButtons.vue";
+import InputCheckBoxes from "../../Origami/src/components/BasicForms/Input.Checkboxes.vue";
 import FieldSetGroup from "../../Origami/src/components/BasicForms/FieldSetGroup.vue";
 import SwitchToggle from "../../Origami/src/components/subComponents/SwitchToggle.vue";
-import {
-	creditList,
-} from "../../Origami/src/stories/100-ProductUI/AgendaManager/Data/charts.js";
+import { creditList } from "../../Origami/src/stories/100-ProductUI/AgendaManager/Data/charts.js";
 
 export default {
 	name: "Sessions",
@@ -304,27 +353,38 @@ export default {
 		BreadCrumb,
 		TreeNav,
 		Btn,
-		SwitchToggle, InputText, InputTextArea,
-FieldSetGroup,InputCheckmarks
+		SwitchToggle,
+		InputText,
+		InputTextArea,
+		FieldSetGroup,
+		InputRadioButtons,
+		InputCheckBoxes,
 	},
 	props: {
 		id: { type: [Number, String], default: 140 },
-		title: { type: String, default: "Ridiculus mus vivamus vestibulum sagittis sapien cum sociis natoque penatibus et magnis dis" },
-		description:{type:String, default:"Eius laudantium repellendus culpa consectetur illo non aut nihil accusantium."},
-		onDemandCheckBoxes:{type:Array, default:()=>['On Completion', 'Next Day','Never']}
+		title: {
+			type: String,
+			default:
+				"Ridiculus mus vivamus vestibulum sagittis sapien cum sociis natoque penatibus et magnis dis",
+		},
+		description: {
+			type: String,
+			default:
+				"Eius laudantium repellendus culpa consectetur illo non aut nihil accusantium.",
+		},
 	},
 	data() {
 		return {
-			agenda:{
+			agenda: {
 				id: this.id,
 				title: this.title,
-				description:this.description,
+				description: this.description,
 				startTime: "",
-				endTime: '',
+				endTime: "",
 				duration: "5",
-				releaseToOnDemand:[]
+				releaseToOnDemand: [{ label: "after completion", selected: false }, { label: "next day", selected: false }, { label: "after program completion", selected: false }, { label: "never", selected: true }], releaseToOnDemandCheckmarks: [{ label: "after completion", selected: false }, { label: "next day", selected: false }, { label: "after program completion", selected: false }, { label: "never", selected: true }],
 			},
-			creditList:creditList,
+			creditList: creditList,
 			navData: {
 				label: "Home",
 				type: "home",
@@ -355,12 +415,14 @@ FieldSetGroup,InputCheckmarks
 								label: "Featured Sessions",
 								type: "collection",
 								pageID: 1351,
-								nodes: [{
-									label: "140",
-									type: "session",
-									pageID: 1351,
-									isActive: true,
-								}]
+								nodes: [
+									{
+										label: "140",
+										type: "session",
+										pageID: 1351,
+										isActive: true,
+									},
+								],
 							},
 							{
 								label: "Pathway Collections",
@@ -493,6 +555,5 @@ FieldSetGroup,InputCheckmarks
 			],
 		};
 	},
-
 };
 </script>

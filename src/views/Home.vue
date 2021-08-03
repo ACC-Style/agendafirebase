@@ -11,7 +11,11 @@
 				font_1
 			"
 		>
-			<TreeNav v-bind="navData" @onNewObject="newModalVisible=true" :toggleOpenByDefault="true" />
+			<TreeNav
+				v-bind="navData"
+				@onNewObject="newModalVisible = true"
+				:toggleOpenByDefault="true"
+			/>
 		</nav>
 		<section class="flex_column flex flex_auto p_5 p-t_4">
 			<header class="flex flex_row font_1 m-t_2">
@@ -93,7 +97,9 @@
 										first Program to this program.
 									</p>
 									<div class="text_center">
-										<Btn @onClick="onNewObject">Add Program</Btn>
+										<Btn @onClick="onNewObject"
+											>Add Program</Btn
+										>
 									</div>
 								</article>
 							</template>
@@ -102,7 +108,9 @@
 									v-for="(program, index) in list"
 									v-bind="program"
 									:key="'Program' + index"
-									@onClick="onProgramClick(program.id,$event)"
+									@onClick="
+										onProgramClick(program.id, $event)
+									"
 								/>
 							</template>
 						</ListLoader>
@@ -112,7 +120,11 @@
 		</section>
 		<Modal v-if="newModalVisible" @onClose="closeAddNewModal">
 			<template v-slot:header><h1>Add Program</h1></template>
-			<NewProgram @onClose="closeAddNewModal" />
+			<NewProgram @onClose="closeAddNewModal" ref="newProgram" />
+			<template v-slot:footer>
+				<Btn @onClick="$refs.newProgram.onSubmit()">Submit</Btn>
+				<Btn @onClick="closeAddNewModal" state="secondary">Cancel</Btn>
+			</template>
 		</Modal>
 	</div>
 </template>
@@ -120,7 +132,7 @@
 <script>
 // @ is an alias to /src
 
-import { programsCollection,deleteProgram } from '@/firebase';
+import { programsCollection, deleteProgram } from '@/firebase';
 import NewProgram from "@/components/newProgram.vue";
 import BreadCrumb from "../../Origami/src/components/Navigation/App.BreadCrumb.vue";
 import TreeNav from "../../Origami/src/components/Navigation/App.SideNav.List.vue";
@@ -271,23 +283,24 @@ export default {
 		};
 	},
 	methods: {
-		closeAddNewModal(){
+		closeAddNewModal() {
 			this.newModalVisible = false;
 			this.getList();
 		},
 		onNewObject() {
 			this.newModalVisible = true;
 		},
-		onDeleteObject(id){
+		onDeleteObject(id) {
 			return id;
 		},
-		onProgramClick(id,payload){
+		async onProgramClick(id, payload) {
 			console.table(payload);
-			console.log(`id ${id}`);
-			if(payload === 'delete'){
-				deleteProgram(id)
+			console.log(`id ${ id }`);
+			if (payload === 'delete') {
+				await deleteProgram(id)
+				this.getList()
 			}
-			this.getList() 
+
 		},
 		async getList() {
 			try {

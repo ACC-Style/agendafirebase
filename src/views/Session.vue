@@ -11,22 +11,21 @@
 				<section class="flex_auto">
 					<div class="flex flex_row">
 						<h1 class="font_5 c_black-9 p-t_4 flex_auto text_left">
-							{{ idNumber }}: {{ sessionTitle }}
+							{{ agenda.id }}: {{ agenda.title }}
 						</h1>
 					</div>
-					<div class="">
+					<form id="AgendaData" class="">
 						<h3>Agenda Data</h3>
 						<div class="flex flex_row gap-x_4">
 							<InputText
-								:inputType="'number'"
-								:label="'ID'"
-								:value="idNumber"
+								:type="'number'"
+								v-model.number="agenda.id"
+								:required="true"
 								>ID</InputText
 							>
 							<InputText
-								:inputType="'text'"
-								:label="'ID'"
-								:value="sessionTitle"
+								v-model="agenda.title"
+								:required="true"
 							>
 								<template v-slot:default>
 									Session Title
@@ -39,12 +38,19 @@
 								</template>
 							</InputText>
 						</div>
-						<InputTextArea class="w_100"
+						<InputTextArea class="w_100" :required="true" v-model="agenda.description"
 							><template v-slot:default>
 								Description
 							</template></InputTextArea
 						>
-					</div>
+						<field-set-group legend="Timing">
+							<input-text v-model="agenda.Date" :type="'date'">Date</input-text>
+							<input-text v-model="agenda.startTime" :type="'time'">Start Time</input-text>
+							<input-text icon="fa-stopwatch"  postLabel="min" v-model.number="agenda.duration" :type="'number'" >Duration</input-text>
+							<InputCheckmarks 
+							v-model="agenda.releaseToOnDemand" :checkboxes="onDemandCheckBoxes" >Release to On Demand</InputCheckmarks>
+						</field-set-group>
+					</form>
 					<div class="m-y_4 p_4 bg_black-3">
 						Section with data around the agenda.
 					</div>
@@ -285,31 +291,40 @@ import TreeNav from "../../Origami/src/components/Navigation/App.SideNav.List.vu
 import Btn from "../../Origami/src/components/subComponents/Btn.vue";
 import InputText from "../../Origami/src/components/BasicForms/Input.Text.vue";
 import InputTextArea from "../../Origami/src/components/BasicForms/Input.TextArea.vue";
+import InputCheckmarks from "../../Origami/src/components/BasicForms/Input.Check.vue";
+import FieldSetGroup from "../../Origami/src/components/BasicForms/FieldSetGroup.vue";
 import SwitchToggle from "../../Origami/src/components/subComponents/SwitchToggle.vue";
-import { sessionListData } from "../../Origami/src/stories/100-ProductUI/AgendaManager/Data/sessionList.js";
 import {
-	programChart,
 	creditList,
 } from "../../Origami/src/stories/100-ProductUI/AgendaManager/Data/charts.js";
+
 export default {
 	name: "Sessions",
 	components: {
 		BreadCrumb,
 		TreeNav,
 		Btn,
-		SwitchToggle, InputText, InputTextArea
+		SwitchToggle, InputText, InputTextArea,
+FieldSetGroup,InputCheckmarks
 	},
 	props: {
-		idNumber: { type: [Number, String], default: 140 },
+		id: { type: [Number, String], default: 140 },
 		title: { type: String, default: "Ridiculus mus vivamus vestibulum sagittis sapien cum sociis natoque penatibus et magnis dis" },
+		description:{type:String, default:"Eius laudantium repellendus culpa consectetur illo non aut nihil accusantium."},
+		onDemandCheckBoxes:{type:Array, default:()=>['On Completion', 'Next Day','Never']}
 	},
 	data() {
 		return {
-			sessionTitle: this.title,
-			list: sessionListData,
-			isSearchVisible: false,
-			chartData: programChart,
-			creditList: creditList,
+			agenda:{
+				id: this.id,
+				title: this.title,
+				description:this.description,
+				startTime: "",
+				endTime: '',
+				duration: "5",
+				releaseToOnDemand:[]
+			},
+			creditList:creditList,
 			navData: {
 				label: "Home",
 				type: "home",
@@ -478,5 +493,6 @@ export default {
 			],
 		};
 	},
+
 };
 </script>

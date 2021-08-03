@@ -1,101 +1,58 @@
 <template>
-	<form @submit.prevent="onSubmit">
+	<form @submit.prevent="onSubmit" class="flex flex_column gap-y_3">
 
 		<div class="form-group">
-			<label for="label">label</label>
-			<input
-				type="text"
-				v-model="form.label"
-				class="form-control"
-				required
-			/>
+			<InputText :inputId="'programTitleInput'" v-model="form.label" :required="true">Title</InputText>
 		</div>
 		<div class="form-group">
-			<label for="label">StartDate</label>
-			<input
-				type="date"
-				v-model="form.startDate"
-				class="form-control"
-				required
-			/>
+			<InputSelect :options="typeOptions">Program Type</InputSelect>
 		</div>
+		<FieldSetGroup legend="Timing of the Program">
+			<div class="form-group">
+			<InputText :type="'date'" v-model="form.startDate" :required="true">StartDate</InputText>
+			</div>
+			<div class="form-group">
+			<InputText :type="'date'" v-model="form.endDate" :required="true">StartDate</InputText>
+			</div>
+		</FieldSetGroup>
+		<FieldSetGroup legend="Prototype Chart Data" color="accent">
+		
+			<div class="form-group">
+			<InputText :type="'number'" v-model.number="form.chartData[0].count">Channels</InputText>
+			</div>
+			<div class="form-group">
+			<InputText :type="'number'" v-model.number="form.chartData[1].count">Complete</InputText>
+			</div>
+			<div class="form-group">
+			<InputText :type="'number'" v-model.number="form.chartData[2].count">Incomplete</InputText>
+			</div>
+			<div class="form-group">
+			<InputText :type="'number'" v-model.number="form.chartData[3].count">Missing</InputText>
+			</div>
+		</FieldSetGroup>
+				<FieldSetGroup legend="Prototype Credit Data" color="accent">
 		<div class="form-group">
-			<label for="label">EndDate</label>
-			<input
-				type="date"
-				v-model="form.endDate"
-				class="form-control"
-				required
-			/>
-		</div>
-		<div class="form-group">
-			<label for="label">Type</label>
-			<select
-				type="number"
-				v-model.number="form.type"
-				class="form-control"
-				required
-			>
-			<option v-for="(option,index) in typeOptions" :key="'option_'+index" :value="option">{{option}}</option>
-			<option value="Confernce">Confernce</option>
-			
-			</select>
-		</div>
-		<div class="form-group">
-			<label for="label">chartData:Channels</label>
-			<input
-				type="number"
-				v-model.number="form.chartData[0].count"
-				class="form-control"
-				required
-			/>
-		</div>
-		<div class="form-group">
-			<label for="label">chartData:Complete</label>
-			<input
-				type="number"
-				v-model.number="form.chartData[1].count"
-				class="form-control"
-				required
-			/>
-		</div>
-		<div class="form-group">
-			<label for="label">chartData:Incomplete</label>
-			<input
-				type="number"
-				v-model.number="form.chartData[2].count"
-				class="form-control"
-				required
-			/>
-		</div>
-		<div class="form-group">
-			<label for="label">chartData:Missing Source</label>
-			<input
-				type="number"
-				v-model.number="form.chartData[3].count"
-				class="form-control"
-				required
-			/>
-		</div>
-		<div class="form-group">
-			<label for="label">Credits: CME</label>
-			<input
-				type="number"
-				v-model.number="form.credits[0].count"
-				class="form-control"
-				required
-			/>
-		</div>
-		<Btn @onCLick="onSubmit">Submit</Btn>
+			<InputText :type="'number'" v-model.number="form.credits[0].count">CME</InputText>
+			</div>
+			<div class="form-group">
+			<InputText :type="'number'" v-model.number="form.credits[1].count">CNE</InputText>
+			</div>
+			<div class="form-group">
+			<InputText :type="'number'" v-model.number="form.credits[2].count">COP</InputText>
+			</div>
+		</FieldSetGroup>
 	</form>
 </template>
 
 <script>
 import { createProgram } from '@/firebase';
-import Btn from "../../Origami/src/components/subComponents/Btn.vue";
+import InputText from '../../Origami/src/components/BasicForms/Input.Text.vue';
+import InputSelect from '../../Origami/src/components/BasicForms/Input.Select.vue';
+import FieldSetGroup from "../../Origami/src/components/BasicForms/FieldSetGroup.vue";
+
 
 export default {
-	components: {Btn},
+	components: {InputText, InputSelect, FieldSetGroup	},
     methods: {
 
         async onSubmit() {
@@ -105,12 +62,10 @@ export default {
     },
     data() {
         return {
-			typeOptions:[
-				"Streaming EDU",
+			typeOptions:["Streaming EDU",
 				"Conference Ondemand",
 				"Live Conference",
-				"Edu Package"
-			],
+				"Edu Package"],	
             form:  {
 				label: '',
 				chartData: [{
@@ -134,6 +89,14 @@ export default {
 				credits: [{
 					label: 'CME',
 					cssClass: 'CME',
+					count: 0
+				},{
+					label: 'CNE',
+					cssClass: 'CNE',
+					count: 0
+				},{
+					label: 'COP',
+					cssClass: 'COP',
 					count: 0
 				}]
 			}

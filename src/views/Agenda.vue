@@ -107,7 +107,7 @@
 									</div>
 								</article>
 							</template>
-							<template v-slot:listLoaded>
+							<template v-slot:default>
 								<Session
 									v-for="(session, index) in list"
 									v-bind="session"

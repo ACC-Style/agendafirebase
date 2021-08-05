@@ -41,13 +41,11 @@
 								:required="true"
 								class="flex_auto w_60"
 							>
-								Session Title
-								<template v-slot:hint>
-									Changing the session title here will on
-									change it for this session only in this
-									agenda. To gloabaly alter the session title
+								Agenda Title
+								<!-- <template v-slot:hint>
+									Changing the Agenda title here will not change the title of the attached session. To gloabaly alter the Agenda and Session title
 									alter it in the session data section.
-								</template>
+								</template> -->
 							</InputText>
 							<InputTextArea
 								class="w_100 flex_none"
@@ -108,7 +106,7 @@
 						</div>
 					</form>
 				</section>
-				<section
+				<aside
 					class="
 						flex_auto
 						w_30
@@ -324,91 +322,29 @@
 							</ul>
 						</div>
 					</div>
-				</section>
+				</aside>
 			</section>
-			<h3 class="font_display font_4 c_primary-n2">Attached Session</h3>
-			<section
-				class="br_1 br_solid br_black-3 br_radius shadow_overlap-light"
-			>
-				<header
-					class="
-						br-b_1
-						br_solid br_black-3
-						p_4
-						flex flex_row
-						justify_center
-					"
-				>
-					<InputText
-						class="self_stretch w_100 flex_auto"
-						v-model="title"
-						:state="'disabled'"
-					></InputText>
-					<Btn class="m-l_3" :size="'small'">Change</Btn>
-					<Btn
-						class="m-l_3"
-						:shadow="false"
-						:size="'small'"
-						:state="'secondary'"
-						>Remove</Btn
-					>
-				</header>
-				<div class="flex flex_row:md">
-					<div class="flex_auto:md w_60">
-						<div class="m_4 p_4 bg_black-3">
-							Content area for the session data.
-						</div>
-						<div class="m_4 p_4 bg_black-3">Source Info</div>
-						<div class="m_4 p_4 bg_black-3">Credit Values.</div>
-					</div>
-					<div
-						class="
-							flex_auto:md
-							w_30
-							bg_black-2
-							shaow_emboss-light
-							br-l_1
-							br_solid br_black-3
-						"
-					>
-						<div
-							class="
-								flex flex_inline
-								bg_white
-								p_3
-								br-b_1
-								br_solid br_black-3
-							"
-						>
-							<h3
-								class="
-									font_display font_4
-									c_primary-n2
-									self_center
-									m_0
-								"
-							>
-								Presentaions
-							</h3>
-							<Btn
-								class="
-									lh_1
-									p-x_3
-									m-l_auto
-									self_center
-									flex_none
-								"
-								:state="'secondary'"
-								:size="'tiny'"
-								:shadow="false"
-								:corner="'round'"
-								><i class="far p-r_3 p_1 fa-plus"></i> new
-							</Btn>
-						</div>
-						&nbsp;
-					</div>
-				</div>
-			</section>
+			<header class="flex flex_row">
+				<div class="flex_auto w_60"><h3 class="font_display font_4 c_primary-n2 ">Attached Session</h3></div>
+				<div class="flex_auto w_30
+						p-l_5
+						max-w_20:lg"><Btn v-if="attachedSession.length>0" class="m-b_4 w_100" size="medium" @onClick="saveSession()"
+						>Save Session</Btn
+					></div>
+				
+								</header>
+			
+			<ListLoader :list="attachedSession">
+					<template v-slot:listEmpty>
+						<ListEmptyCard>
+							<template v-slot:header><span class="c_alert m-x_3 font_bold">Missing Source: No Session Attached</span></template>
+							You must have an attached session to complete an agenda item.
+							<template v-slot:footer><div class="flex flex_inline gap-x_3"><Btn :state="'secondary'" class="flex_auto" @onClick="newSession()"><i class="far p-r_3 p_1 fa-plus"></i> New Session</Btn><Btn :state="'primary'" class="flex_auto"><i class="far p-r_3 p_1 fa-paperclip"></i>Attach Session</Btn></div></template>
+						</ListEmptyCard>
+					</template>
+					<AttachedSession @onRemove="attachedSession=[]" :session="sessionData" v-for="(sessionData, index) in attachedSession" :key="'session_'+ index"/>
+			</ListLoader>
+		
 		</section>
 		<Modal v-if="newTagModalVisible" @onClose="newTagModalVisible = false">
 			<template v-slot:header><h1>Add Program</h1></template>
@@ -434,20 +370,23 @@ import InputRadioButtons from "../../Origami/src/components/BasicForms/Input.Rad
 import InputCheckBoxes from "../../Origami/src/components/BasicForms/Input.Checkboxes.vue";
 import FieldSetGroup from "../../Origami/src/components/BasicForms/FieldSetGroup.vue";
 import SwitchToggle from "../../Origami/src/components/subComponents/SwitchToggle.vue";
-import { creditTypes } from "@/components/creditTypes.js";
+import AttachedSession from "@/components/AttachedSession.vue";
+import ListLoader from "../../Origami/src/components/subComponents/ListLoader.vue";
+import ListEmptyCard from "../../Origami/src/components/subComponents/ListEmptyCard.vue";
+import { creditTypes } from "@/components/CreditTypes.js";
 import {
 	agendasCollection,
 	updateAgenda,
 	tagsCollection,
 } from "@/firebase";
 import Modal from "../../Origami/src/components/subComponents/Modal.vue";
-import NewTag from "@/components/newTags.vue";
+import NewTag from "@/components/NewTagForm.vue";
 import moment from "moment";
 
 export default {
 	name: "Sessions",
 	components: {
-		BreadCrumb,
+		BreadCrumb,ListLoader,
 		TreeNav,
 		Btn,
 		SwitchToggle,
@@ -458,27 +397,22 @@ export default {
 		InputCheckBoxes,
 		Modal,
 		NewTag,
+		AttachedSession,
+		ListEmptyCard
 	},
 	props: {
-		id: { type: [Number, String], default: 140 },
-		title: {
-			type: String,
-			default:
-				"Ridiculus mus vivamus vestibulum sagittis sapien cum sociis natoque penatibus et magnis dis",
-		},
-		description: {
-			type: String,
-			default:
-				"Eius laudantium repellendus culpa consectetur illo non aut nihil accusantium.",
-		},
+		id: { type: [Number, String], default: "0" },
 	},
 	data() {
 		return {
-			documentID: "0",
+
+			documentID: this.id,
+			attachedSession: [],
+			emptySession:[{ title:'', description:''}],
 			agenda: {
-				id: this.id,
-				title: this.title,
-				description: this.description,
+				id: 0,
+				title: '',
+				description: '',
 				startTime: "",
 				endTime: "",
 				duration: "5",
@@ -706,7 +640,7 @@ export default {
 			this.agenda["title"] = "New Agenda";
 			this.agenda["credits"] = [{ type: "COP", count: 1 }];
 			this.agenda["scheduledRelease"] = false;
-			this.creditsActiveUpdate("COP", 0, false);
+			this.creditsActiveUpdate("COP", 1, false);
 		},
 		async onUpdate() {
 			await updateAgenda(this.documentID, this.agenda);
@@ -756,6 +690,12 @@ export default {
 			tagsCollection.doc(id).delete();
 			this.getAllTags();
 		},
+		newSession(){
+				this.emptySession[0]['title'] = this.agenda.title;
+				this.emptySession[0]['description'] = this.agenda.description;
+				this.emptySession[0]['credits'] = this.agenda.credits;
+				this.attachedSession = this.emptySession
+			}
 	},
 	mounted() {
 		this.getAgenda(this.documentID);

@@ -65,7 +65,6 @@
 								:shadow="false"
 								:corner="'round'"
 								><i class="far p-r_3 p_1 fa-plus"></i> new
-								channel
 							</Btn>
 						</div>
 					</div>
@@ -131,7 +130,7 @@
 									</div>
 								</article>
 							</template>
-							<template v-slot:listLoaded>
+							<template v-slot:default>
 								<Channel
 									v-for="(channel, index) in list"
 									v-bind="channel"

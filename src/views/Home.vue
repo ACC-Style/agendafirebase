@@ -103,7 +103,7 @@
 									</div>
 								</article>
 							</template>
-							<template v-slot:listLoaded>
+							<template v-slot:default>
 								<Program
 									v-for="(program, index) in list"
 									v-bind="program"

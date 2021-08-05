@@ -100,12 +100,14 @@ export default {
 	methods: {
 
 		async onSubmit() {
-			await createProgram({ ... this.form });
+			let id = await createProgram({ ... this.form });
 			this.$emit('onClose');
+			this.documentID = id;
 		}
 	},
 	data() {
 		return {
+			documentID: -1,
 			typeOptions: ["Streaming EDU",
 				"Conference Ondemand",
 				"Live Conference",

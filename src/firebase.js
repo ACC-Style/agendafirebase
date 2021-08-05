@@ -32,6 +32,47 @@ export const updateProgram = (id, program) => {
 export const deleteProgram = (id) => {
     return programsCollection.doc(id).delete()
 }
+export const tagsCollection = db.collection('tags')
+
+export const createTag = (tag) => {
+    tagsCollection.add(tag).then(function(docRef) {
+        return docRef.id
+    })
+}
+
+export const getTag = async (id) => {
+    const tag = await tagsCollection.doc(id).get()
+    return tag.exists ? tag.data() : null
+}
+
+
+export const updateTag = (id, tag) => {
+    return tagsCollection.doc(id).update(tag)
+}
+
+export const deleteTag = (id) => {
+    return tagsCollection.doc(id).delete()
+}
+
+// Agenda 
+export const agendasCollection = db.collection('agendas')
+
+export const createAgenda = (Agenda) => {
+    agendasCollection.add(Agenda)
+}
+
+export const getAgenda = async (id) => {
+    const Agenda = await agendasCollection.doc(id).get()
+    return Agenda.exists ? Agenda.data() : null
+}
+
+export const updateAgenda = (id, Agenda) => {
+    return agendasCollection.doc(id).update(Agenda)
+}
+
+export const deleteAgenda = (id) => {
+    return agendasCollection.doc(id).delete()
+}
 
 
 

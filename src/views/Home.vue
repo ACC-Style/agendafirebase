@@ -160,10 +160,6 @@ export default {
 		return {
 			newModalVisible: false,
 			list: null,
-
-			// list: programListData.sort((a, b) => {
-			// 	return a.label < b.label ? -1 : 1;
-			// }),
 			navData: {
 				label: "Home",
 				type: "home",

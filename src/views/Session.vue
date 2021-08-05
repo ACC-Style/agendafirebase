@@ -25,7 +25,9 @@
 						</h1>
 					</div>
 					<form id="AgendaData" class="">
-						<h3  class="font_display font_4 c_primary-n2">Agenda Data</h3>
+						<h3 class="font_display font_4 c_primary-n2">
+							Agenda Data
+						</h3>
 						<div class="flex flex_row flex_wrap gap-y_4 gap-x_4">
 							<InputText
 								class="flex_auto w_5"
@@ -66,7 +68,7 @@
 									"
 								>
 									<input-text
-										v-model="agenda.Date"
+										v-model="agenda.startDate"
 										:type="'date'"
 										>Date</input-text
 									>
@@ -91,6 +93,7 @@
 										>
 									</InputRadioButtons>
 									<InputCheckBoxes
+										v-if="false"
 										class="flex_auto"
 										v-model="
 											agenda.releaseToOnDemandCheckmarks
@@ -115,6 +118,9 @@
 						font_0
 					"
 				>
+					<Btn class="m-b_4" size="medium" @onClick="saveAgenda()"
+						>Save Agenda</Btn
+					>
 					<div class="max-w_20 font_0">
 						<div class="">
 							<h3 class="font_display font-size_up-2">Actions</h3>
@@ -132,10 +138,11 @@
 										br_0 br_solid br_black-2
 										br-t_1
 										h:bg_primary-5
+										p-x_3
 									"
 								>
 									<a href="" class="h:undecorated"
-										>Duplicate Agenda Item</a
+										>Duplicate</a
 									>
 								</li>
 								<li
@@ -144,11 +151,10 @@
 										br_0 br_solid br_black-2
 										br-t_1
 										h:bg_primary-5
+										p-x_3
 									"
 								>
-									<a href="" class="h:undecorated"
-										>Move Session</a
-									>
+									<a href="" class="h:undecorated">Move</a>
 								</li>
 								<li
 									class="
@@ -156,10 +162,58 @@
 										br_0 br_solid br_black-2
 										br-t_1
 										h:bg_primary-5
+										p-x_3
 									"
 								>
 									<a href="" class="h:undecorated"
 										>Export Data</a
+									>
+								</li>
+							</ul>
+						</div>
+						<div>
+							<h3 class="font_display font-size_up-2">
+								Release Mode
+							</h3>
+							<p class="font-size_down-1 c_black-6">
+								how are the sessions release? Are they all at
+								once or are they scheduled at different times.
+							</p>
+							<ul class="ul_none m-b_5 font-size_up">
+								<li
+									class="
+										lh_2
+										p-y_2
+										flex flex_row
+										justify_start
+									"
+								>
+									<SwitchToggle
+										:size="'tiny'"
+										:corner="'round'"
+										v-bind:value="scheduledRelease"
+										@input="toggleScheduledRelease($event)"
+										:activeState="'primary'"
+										:notActiveState="'secondary'"
+										>Scheduled</SwitchToggle
+									>
+								</li>
+								<li
+									class="
+										lh_2
+										p-y_2
+										flex flex_row
+										justify_start
+									"
+								>
+									<SwitchToggle
+										:size="'tiny'"
+										:corner="'round'"
+										v-bind:value="!scheduledRelease"
+										@input="toggleScheduledRelease(!$event)"
+										:activeState="'primary'"
+										:notActiveState="'secondary'"
+										>Unscheduled</SwitchToggle
 									>
 								</li>
 							</ul>
@@ -174,7 +228,7 @@
 							</p>
 							<ul class="list-group ul_none m-b_5 font-size_up">
 								<li
-									v-for="(key, value, index) in creditList"
+									v-for="(credit, index) in agenda.credits"
 									:key="'c_' + index"
 									class="
 										lh_2
@@ -192,9 +246,22 @@
 										:activeState="'primary'"
 										:activeIcon="'fa-check'"
 										:notActiveState="'secondary'"
-										>{{ value }}
-										<span class="c_primary font-size_down"
-											>({{ key }})</span
+										v-model="creditsActive[credit.type]"
+										@input="
+											creditsActiveUpdate(
+												credit.type,
+												index,
+												$event
+											)
+										"
+										><span
+											v-html="creditLabel(credit.type)"
+										>
+										</span>
+										<span
+											v-if="credit.type != 'COP'"
+											class="c_primary font-size_down"
+											>({{ creditType.count }})</span
 										></SwitchToggle
 									>
 								</li>
@@ -211,6 +278,7 @@
 									:size="'tiny'"
 									:shadow="false"
 									:corner="'round'"
+									@onClick="newTagModalVisible = true"
 									><i class="far p-r_3 p_1 fa-plus"></i> new
 								</Btn>
 							</div>
@@ -220,6 +288,7 @@
 							</p>
 							<ul class="list-group ul_none m-b_5">
 								<li
+									v-for="tag in tags"
 									class="
 										lh_2
 										p-y_2
@@ -228,42 +297,14 @@
 										flex flex_row
 										justify_start
 									"
+									:key="'tag_' + tag.id"
 								>
 									<div
 										class="flex_auto self_center c_primary"
 									>
-										Session Format:<strong>
-											Pathway Collection</strong
-										>
-									</div>
-									<div
-										class="
-											flex_none
-											self_center
-											c_primary
-											h:c_alert-n2
-											h:bg_alert-4
-											br_radius
-										"
-									>
-										<i class="far fa-times p_3"></i>
-									</div>
-								</li>
-								<li
-									class="
-										lh_2
-										p-y_2
-										br_0 br_solid br_black-2
-										br-t_1
-										flex flex_row
-										justify_start
-									"
-								>
-									<div
-										class="flex_auto self_center c_primary"
-									>
-										Session Type:<strong>
-											Lounge &amp; Learn
+										{{ tag.category }}:
+										<strong>
+											{{ tag.label }}
 										</strong>
 									</div>
 									<div
@@ -275,6 +316,7 @@
 											h:bg_alert-4
 											br_radius
 										"
+										@click="onDeleteTag(tag.id)"
 									>
 										<i class="far fa-times p_3"></i>
 									</div>
@@ -297,7 +339,11 @@
 						justify_center
 					"
 				>
-					<InputText class="self_stretch w_100 flex_auto" v-model="title" :state="'disabled'"></InputText>
+					<InputText
+						class="self_stretch w_100 flex_auto"
+						v-model="title"
+						:state="'disabled'"
+					></InputText>
 					<Btn class="m-l_3" :size="'small'">Change</Btn>
 					<Btn
 						class="m-l_3"
@@ -315,22 +361,65 @@
 						<div class="m_4 p_4 bg_black-3">Source Info</div>
 						<div class="m_4 p_4 bg_black-3">Credit Values.</div>
 					</div>
-					<div class="flex_auto:md w_30 bg_black-2 shaow_emboss-light br-l_1 br_solid br_black-3">
-						<div class="flex flex_inline bg_white p_3  br-b_1 br_solid br_black-3">
-							<h3 class="font_display font_4 c_primary-n2 self_center m_0">Presentaions</h3>
+					<div
+						class="
+							flex_auto:md
+							w_30
+							bg_black-2
+							shaow_emboss-light
+							br-l_1
+							br_solid br_black-3
+						"
+					>
+						<div
+							class="
+								flex flex_inline
+								bg_white
+								p_3
+								br-b_1
+								br_solid br_black-3
+							"
+						>
+							<h3
+								class="
+									font_display font_4
+									c_primary-n2
+									self_center
+									m_0
+								"
+							>
+								Presentaions
+							</h3>
 							<Btn
-									class="lh_1 p-x_3 m-l_auto self_center flex_none"
-									:state="'secondary'"
-									:size="'tiny'"
-									:shadow="false"
-									:corner="'round'"
-									><i class="far p-r_3 p_1 fa-plus"></i> new
-								</Btn>
+								class="
+									lh_1
+									p-x_3
+									m-l_auto
+									self_center
+									flex_none
+								"
+								:state="'secondary'"
+								:size="'tiny'"
+								:shadow="false"
+								:corner="'round'"
+								><i class="far p-r_3 p_1 fa-plus"></i> new
+							</Btn>
 						</div>
-						&nbsp;</div>
+						&nbsp;
+					</div>
 				</div>
 			</section>
 		</section>
+		<Modal v-if="newTagModalVisible" @onClose="newTagModalVisible = false">
+			<template v-slot:header><h1>Add Program</h1></template>
+			<NewTag @onClose="newTagModalVisible = false" ref="newTag" />
+			<template v-slot:footer>
+				<Btn @onClick="onSubmitTag()">Submit</Btn>
+				<Btn @onClick="newTagModalVisible = false" state="secondary"
+					>Cancel</Btn
+				>
+			</template>
+		</Modal>
 	</div>
 </template>
 
@@ -345,7 +434,15 @@ import InputRadioButtons from "../../Origami/src/components/BasicForms/Input.Rad
 import InputCheckBoxes from "../../Origami/src/components/BasicForms/Input.Checkboxes.vue";
 import FieldSetGroup from "../../Origami/src/components/BasicForms/FieldSetGroup.vue";
 import SwitchToggle from "../../Origami/src/components/subComponents/SwitchToggle.vue";
-import { creditList } from "../../Origami/src/stories/100-ProductUI/AgendaManager/Data/charts.js";
+import { creditTypes } from "@/components/creditTypes.js";
+import {
+	agendasCollection,
+	updateAgenda,
+	tagsCollection,
+} from "@/firebase";
+import Modal from "../../Origami/src/components/subComponents/Modal.vue";
+import NewTag from "@/components/newTags.vue";
+import moment from "moment";
 
 export default {
 	name: "Sessions",
@@ -359,6 +456,8 @@ export default {
 		FieldSetGroup,
 		InputRadioButtons,
 		InputCheckBoxes,
+		Modal,
+		NewTag,
 	},
 	props: {
 		id: { type: [Number, String], default: 140 },
@@ -375,6 +474,7 @@ export default {
 	},
 	data() {
 		return {
+			documentID: "0",
 			agenda: {
 				id: this.id,
 				title: this.title,
@@ -382,9 +482,19 @@ export default {
 				startTime: "",
 				endTime: "",
 				duration: "5",
-				releaseToOnDemand: [{ label: "after completion", selected: false }, { label: "next day", selected: false }, { label: "after program completion", selected: false }, { label: "never", selected: true }], releaseToOnDemandCheckmarks: [{ label: "after completion", selected: false }, { label: "next day", selected: false }, { label: "after program completion", selected: false }, { label: "never", selected: true }],
+				releaseToOnDemand: [
+					{ label: "after completion", selected: false },
+					{ label: "next day", selected: false },
+					{ label: "after program completion", selected: false },
+					{ label: "never", selected: true },
+				],
+				credits: [],
+				scheduledRelease: true,
 			},
-			creditList: creditList,
+			scheduledRelease: true,
+			creditTypes: creditTypes,
+			creditsActive: {},
+			newTagModalVisible: false,
 			navData: {
 				label: "Home",
 				type: "home",
@@ -553,7 +663,106 @@ export default {
 					showRemove: true,
 				},
 			],
+			tags: [],
 		};
+	},
+	methods: {
+		async onCreate() {
+			const { id } = await agendasCollection.add(this.agenda);
+			this.documentID = id;
+		},
+		async getAgenda(id) {
+			// agendasCollection
+			let docRef = agendasCollection.doc(id);
+
+			docRef
+				.get()
+				.then((doc) => {
+					if (doc.exists) {
+						console.log("Document data:", doc.data());
+						this.agenda = doc.data();
+						if (id == "0") {
+							this.setDefaultValues();
+						}
+					} else {
+						// doc.data() will be undefined in this case
+						console.log("No such document!");
+					}
+				})
+				.catch((error) => {
+					console.log("Error getting document:", error);
+				});
+		},
+		dateStringFormated(date) {
+			return moment(date).format("YYYY-MM-DD");
+		},
+		setDefaultValues() {
+			let date = new Date(2021, 0, 1, 0, 0, 0, 0);
+			this.agenda["startDate"] = moment(date).format("YYYY-MM-DD");
+			this.agenda["endDate"] = moment(date).format("YYYY-MM-DD");
+			this.agenda["startTime"] = moment(date).format("HH:mm");
+			this.agenda["duration"] = 0;
+			this.agenda["id"] = 0;
+			this.agenda["title"] = "New Agenda";
+			this.agenda["credits"] = [{ type: "COP", count: 1 }];
+			this.agenda["scheduledRelease"] = false;
+			this.creditsActiveUpdate("COP", 0, false);
+		},
+		async onUpdate() {
+			await updateAgenda(this.documentID, this.agenda);
+		},
+		creditLabel(type) {
+			return type;
+		},
+		saveAgenda() {
+			if (this.documentID == "0") {
+				this.onCreate();
+			} else {
+				this.onUpdate();
+			}
+		},
+		toggleScheduledRelease(event) {
+			console.log(event);
+			this.scheduledRelease = event;
+			this.agenda.scheduledRelease = event;
+		},
+		creditsActiveUpdate(type, index, event) {
+			this.creditsActive[type] = event;
+			this.agenda.credits[index].active = event;
+		},
+		async getAllTags() {
+			try {
+				const { docs } = await tagsCollection.get();
+
+				this.tags = docs.map((doc) => {
+					const { id } = doc;
+					const data = doc.data();
+					console.log(data);
+					return { id, ...data };
+				});
+
+				console.log("loaded Tag list");
+			} catch (error) {
+				throw new Error("Something gone wrong with tags!" + error);
+			}
+		},
+		onSubmitTag() {
+			console.log("trying to add a tag");
+			this.$refs.newTag.onSubmit();
+			this.getAllTags();
+		},
+		onDeleteTag(id) {
+			console.log(id + "trying to delete tag");
+			tagsCollection.doc(id).delete();
+			this.getAllTags();
+		},
+	},
+	mounted() {
+		this.getAgenda(this.documentID);
+		// this.tags = getAllTags().then( function(val) {
+		// 	return val;
+		// }) ;
+		this.getAllTags();
 	},
 };
 </script>

@@ -169,7 +169,7 @@
 								</li>
 							</ul>
 						</div>
-						<div>
+						<!-- <div>
 							<h3 class="font_display font-size_up-2">
 								Release Mode
 							</h3>
@@ -215,7 +215,7 @@
 									>
 								</li>
 							</ul>
-						</div>
+						</div> -->
 						<div>
 							<h3 class="font_display font-size_up-2">
 								Grant Credit Access

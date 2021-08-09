@@ -130,58 +130,7 @@
 					br_solid br_black-3
 				"
 			>
-				<div
-					class="
-						flex flex_inline
-						bg_white
-						p_3
-						br-b_1
-						br_solid br_black-3
-					"
-				>
-					<h3
-						class="font_display font_4 c_primary-n2 self_center m_0"
-					>
-						Presentaions
-					</h3>
-					<Btn
-						class="lh_1 p-x_3 m-l_auto self_center flex_none"
-						:state="'secondary'"
-						:size="'tiny'"
-						:shadow="false"
-						:corner="'round'"
-						><i class="far p-r_3 p_1 fa-plus"></i> new
-					</Btn>
-                    <Btn
-						class="lh_1 p-x_3 m-l_3 self_center flex_none"
-						:state="'secondary'"
-						:size="'tiny'"
-						:shadow="false"
-						:corner="'round'"
-						><i class="far p-r_3 p_1 fa-paperclip"></i> attach
-					</Btn>
-				</div>
-				<ListLoader :list="presentations">
-					<template v-slot:listEmpty>
-						<ListEmptyCard>
-							<template v-slot:header>No Presentations</template>
-							There are no presentations for this session. Either start a new presentation or attach one from the library.
-							<template v-slot:footer
-								><div class="flex flex_inline gap-x_3">
-									<Btn
-										:state="'secondary'" :size="'small'"
-										class="flex_auto"
-										@onClick="newPresentaiton()"
-										><i class="far p-r_3 p_1 fa-plus"></i>
-										New</Btn
-									><Btn @onClick="attachPresentaiton()" :state="'primary'" :size="'small'" class="flex_auto"
-										><i class="far p-r_3 p_1 fa-paperclip"></i> Attach</Btn
-									>
-								</div></template
-							>
-						</ListEmptyCard>
-					</template>
-				</ListLoader>
+			<Presentations></Presentations >
 			</div>
 		</div>
 	</section>
@@ -192,13 +141,12 @@ import Btn from "../../Origami/src/components/subComponents/Btn.vue";
 import InputText from "../../Origami/src/components/BasicForms/Input.Text.vue";
 import InputTextArea from "../../Origami/src/components/BasicForms/Input.TextArea.vue";
 import FieldSetGroup from "../../Origami/src/components/BasicForms/FieldSetGroup.vue";
-import ListLoader from "../../Origami/src/components/subComponents/ListLoader.vue";
-import ListEmptyCard from "../../Origami/src/components/subComponents/ListEmptyCard.vue";
+import Presentations from '@/components/AttachedPresentations.vue'
 import { creditTypes } from "@/components/CreditTypes.js";
 
 export default {
 	name: "AttachedSession",
-	components: { Btn, InputText, InputTextArea, FieldSetGroup, ListLoader, ListEmptyCard },
+	components: { Btn, InputText, InputTextArea, FieldSetGroup,Presentations},
 	props: {
 		session: { type: Object, default: () => { } },
 		creditTypes: { type: Array, default: () => { return creditTypes } }

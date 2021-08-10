@@ -382,6 +382,12 @@ export default {
 					},
 					{ label: "New Session", type: "new" },
 					{
+						label: "All Sessions",
+						type: "sessions",
+
+						pageID: 1351,
+					},
+					{
 						label: "Elements Library",
 						type: "headline",
 						nodes: [

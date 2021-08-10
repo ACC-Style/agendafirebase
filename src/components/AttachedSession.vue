@@ -18,9 +18,16 @@
 				>Remove</Btn
 			>
 		</header>
-		<div class="flex flex_row:md">
+		<div class="flex flex_row:md flex_column">
 			<div
-				class="flex_auto:md w_60 p_4 p-x_5:lg flex_column flex gap-y_4"
+				class="
+					flex_auto
+					w_60:md
+					p_4
+					p-x_5:lg
+					flex_column flex
+					gap-y_4
+				"
 			>
 				<InputText v-model="title" :required="true" class="">
 					Session Title
@@ -80,15 +87,35 @@
 						<InputText v-model="nothing" class="w_100 m-b_4"
 							>File Name</InputText
 						>
-						<div class="flex flex_column w_100 bg_primary-5 br_dashed br_radius br_2 br_primary p_4 m-b_4 text_center">
-							<p>Either Drag the file into this space or click the browse for file button to find the attachment.</p>
-                            <span class="m-b_n5 m-t_4"><Btn 
-                            class="m-x_5"
-							:state="'secondary'"
-							:size="'small'">Attach from Library</Btn><Btn 
-                            class="m-x_5"
-							:state="'primary'"
-							:size="'small'">Browse for File</Btn></span>
+						<div
+							class="
+								flex flex_column
+								w_100
+								bg_primary-5
+								br_dashed br_radius br_2 br_primary
+								p_4
+								m-b_4
+								text_center
+							"
+						>
+							<p>
+								Either Drag the file into this space or click
+								the browse for file button to find the
+								attachment.
+							</p>
+							<span class="m-b_n5 m-t_4"
+								><Btn
+									class="m-x_5"
+									:state="'secondary'"
+									:size="'small'"
+									>Attach from Library</Btn
+								><Btn
+									class="m-x_5"
+									:state="'primary'"
+									:size="'small'"
+									>Browse for File</Btn
+								></span
+							>
 						</div>
 					</FieldSetGroup>
 					<div class="m-t_3">
@@ -107,30 +134,38 @@
 				</FieldSetGroup>
 				<FieldSetGroup id="CreditValues">
 					<template v-slot:legend>Avaliable Credits</template>
-					<div class="flex flex_row flex_wrap m-t_3 w_100">
+					<div
+						class="
+							flex flex_row flex_wrap
+							m-t_3
+							w_100
+							gap-y_3
+							gap-x_4
+						"
+					>
 						<InputText
 							:type="'number'"
-							class="flex_shrink w_1-third"
+							class="flex_grow w_50 w_40:md max-w_30:md"
 							v-for="(credit, index) in credits"
 							:key="'credit_' + index"
-							:postLabel="credit.type"
-							v-model="credit.count"
+							:postLabel="creditLabel(credit.type)"
+							v-model="credits[index].count"
+							@onStateChange="onUpdateCredits()"
 						></InputText>
 					</div>
 				</FieldSetGroup>
 			</div>
-
 			<div
 				class="
-					flex_auto:md
-					w_30
+					flex_auto
+					w_30:md
 					bg_black-2
 					shaow_emboss-light
 					br-l_1
 					br_solid br_black-3
 				"
 			>
-			<Presentations></Presentations >
+				<Presentations></Presentations>
 			</div>
 		</div>
 	</section>
@@ -146,7 +181,7 @@ import { creditTypes } from "@/components/CreditTypes.js";
 
 export default {
 	name: "AttachedSession",
-	components: { Btn, InputText, InputTextArea, FieldSetGroup,Presentations},
+	components: { Btn, InputText, InputTextArea, FieldSetGroup, Presentations },
 	props: {
 		session: { type: Object, default: () => { } },
 		creditTypes: { type: Array, default: () => { return creditTypes } }
@@ -173,9 +208,7 @@ export default {
 
 	},
 	mounted() {
-		let a = this.creditTypes.map((credit) => { return { 'type': credit.type, 'count': 0 } });
-
-
+		let a = this.creditTypes.map((credit) => { return { 'type': credit.type, 'count': 0, 'active':true } });
 		this.title = (this.session.title || "");
 		this.description = (this.session.description || "");
 		this.liveURL = (this.session.liveURL || "");
@@ -185,19 +218,28 @@ export default {
 		this.hasAttachementSource = (this.session.hasAttachementSource || false);
 		this.attachmentURL = (this.session.attachmentURL || "");
 		this.credits = a.map(credit => this.creditMatch(credit)).sort((a, b) => { return a.type.localeCompare(b.type) });
-
-		// this.credits = (this.session.credits || a);
 		this.sessionTags = (this.session.sessionTags || []);
 	},
 	methods: {
-        newPresentaiton(){},
-        attachPresentation(){},
+		newPresentaiton() { },
+		attachPresentation() { },
 		creditMatch(credit) {
 			let index = this.session.credits.map(e => e.type).indexOf(credit.type);
 			if (index != -1) {
 				credit.count = this.session.credits[index].count;
 			}
 			return credit;
+		},
+		creditLabel(type) {
+			console.log(this.creditTypes);
+			let creditIndex = this.creditTypes.findIndex(c => c.type == type);
+			console.log(this.creditTypes[creditIndex].shortName)
+			return this.creditTypes[creditIndex].shortName;
+		},
+		onUpdateCredits() {
+			
+			
+			this.$emit('onUpdateCredits', this.credits)
 		},
 		onInput() {
 			let obj = {
@@ -214,6 +256,7 @@ export default {
 
 			};
 			return obj;
+			
 		}
 	}
 
